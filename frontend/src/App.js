@@ -1,28 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+// URL definitiva - ajuste conforme seu ambiente
+const API_URL = 'http://localhost:3000/passaros'; // Para desenvolvimento local
+
 function App() {
   const [passaros, setPassaros] = useState([]);
   const [form, setForm] = useState({ nome: '', especie: '', idade: '' });
+  const [status, setStatus] = useState('');
 
+  // Carrega passarinhos ao iniciar
   useEffect(() => {
-    fetch('http://backend:3000/passaros')
-      .then(res => res.json())
-      .then(data => setPassaros(data));
+    fetchPassaros();
   }, []);
 
-  const handleSubmit = (e) => {
+  const fetchPassaros = async () => {
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      setPassaros(data);
+    } catch (error) {
+      setStatus(`Erro: ${error.message}`);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    fetch('http://backend:3000/passaros', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    })
-    .then(res => res.json())
-    .then(newPassaro => {
-      setPassaros([newPassaro, ...passaros]);
+    setStatus('Cadastrando...');
+    
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+
+      if (!response.ok) throw new Error('Falha no cadastro');
+      
+      await fetchPassaros(); // Recarrega a lista
       setForm({ nome: '', especie: '', idade: '' });
-    });
+      setStatus('Cadastro realizado!');
+    } catch (error) {
+      setStatus(`Erro: ${error.message}`);
+    }
   };
 
   const handleChange = (e) => {
@@ -38,7 +58,7 @@ function App() {
           name="nome"
           value={form.nome}
           onChange={handleChange}
-          placeholder="Nome do passarinho"
+          placeholder="Nome"
           required
         />
         <input
@@ -53,21 +73,22 @@ function App() {
           type="number"
           value={form.idade}
           onChange={handleChange}
-          placeholder="Idade (meses)"
+          placeholder="Idade"
         />
+        
         <button type="submit">Cadastrar</button>
       </form>
 
-      <div className="lista">
-        <h2>Passarinhos Cadastrados</h2>
-        <ul>
-          {passaros.map(p => (
-            <li key={p.id}>
-              <strong>{p.nome}</strong> - {p.especie} ({p.idade || '?'} meses)
-            </li>
-          ))}
-        </ul>
-      </div>
+      <p>{status}</p>
+
+      <h2>Passarinhos Cadastrados</h2>
+      <ul>
+        {passaros.map((p) => (
+          <li key={p.id}>
+            {p.nome} - {p.especie} ({p.idade} meses)
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

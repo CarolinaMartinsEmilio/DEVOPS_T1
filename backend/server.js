@@ -4,9 +4,11 @@ const cors = require('cors');
 const app = express();
 const port = 3000;
 
+// Configurações essenciais
 app.use(cors());
 app.use(express.json());
 
+// Conexão com o PostgreSQL
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -15,35 +17,52 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-// Criar tabela se não existir
-async function createTable() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS passaros (
-      id SERIAL PRIMARY KEY,
-      nome VARCHAR(100) NOT NULL,
-      especie VARCHAR(100) NOT NULL,
-      idade INT,
-      data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-}
-createTable();
+// Rota raiz para teste
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'API funcionando',
+    message: 'Bem-vindo à API de Cadastro de Passarinhos',
+    endpoints: {
+      listar: 'GET /passaros',
+      cadastrar: 'POST /passaros'
+    }
+  });
+});
 
-// Rotas da API
+// Rotas da aplicação
 app.get('/passaros', async (req, res) => {
-  const { rows } = await pool.query('SELECT * FROM passaros ORDER BY id DESC');
-  res.json(rows);
+  try {
+    const { rows } = await pool.query('SELECT * FROM passaros ORDER BY id DESC');
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao buscar passarinhos' });
+  }
 });
 
 app.post('/passaros', async (req, res) => {
   const { nome, especie, idade } = req.body;
-  const { rows } = await pool.query(
-    'INSERT INTO passaros (nome, especie, idade) VALUES ($1, $2, $3) RETURNING *',
-    [nome, especie, idade]
-  );
-  res.status(201).json(rows[0]);
+  
+  if (!nome || !especie) {
+    return res.status(400).json({ error: 'Nome e espécie são obrigatórios' });
+  }
+
+  try {
+    const { rows } = await pool.query(
+      'INSERT INTO passaros (nome, especie, idade) VALUES ($1, $2, $3) RETURNING *',
+      [nome, especie, idade || null]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao cadastrar passarinho' });
+  }
 });
 
+// Inicia o servidor
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
+  console.log('Banco de dados configurado com:');
+  console.log(`Host: ${process.env.DB_HOST}`);
+  console.log(`Database: ${process.env.DB_NAME}`);
 });
