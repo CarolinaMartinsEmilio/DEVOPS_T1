@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// URL definitiva - ajuste conforme seu ambiente
-const API_URL = 'http://localhost:3000/passaros'; // Para desenvolvimento local
+// Rota relativa, será redirecionada via NGINX para o backend
+const API_URL = '/api/passaros';
+
 
 function App() {
   const [passaros, setPassaros] = useState([]);
   const [form, setForm] = useState({ nome: '', especie: '', idade: '' });
   const [status, setStatus] = useState('');
 
-  // Carrega passarinhos ao iniciar
   useEffect(() => {
     fetchPassaros();
   }, []);
@@ -27,17 +27,17 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('Cadastrando...');
-    
+
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(form),
       });
 
       if (!response.ok) throw new Error('Falha no cadastro');
-      
-      await fetchPassaros(); // Recarrega a lista
+
+      await fetchPassaros();
       setForm({ nome: '', especie: '', idade: '' });
       setStatus('Cadastro realizado!');
     } catch (error) {
@@ -52,7 +52,7 @@ function App() {
   return (
     <div className="App">
       <h1>Cadastro de Passarinhos</h1>
-      
+
       <form onSubmit={handleSubmit}>
         <input
           name="nome"
@@ -75,7 +75,7 @@ function App() {
           onChange={handleChange}
           placeholder="Idade"
         />
-        
+
         <button type="submit">Cadastrar</button>
       </form>
 

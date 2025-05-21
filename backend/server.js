@@ -4,8 +4,12 @@ const cors = require('cors');
 const app = express();
 const port = 3000;
 
-// Configurações essenciais
-app.use(cors());
+
+app.use(cors({
+  origin: 'http://frontend', // Nome do serviço no docker-compose
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 app.use(express.json());
 
 // Conexão com o PostgreSQL
