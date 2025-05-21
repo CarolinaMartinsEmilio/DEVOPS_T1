@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// Rota relativa, será redirecionada via NGINX para o backend
 const API_URL = '/api/passaros';
-
 
 function App() {
   const [passaros, setPassaros] = useState([]);
   const [form, setForm] = useState({ nome: '', especie: '', idade: '' });
+  const [editingId, setEditingId] = useState(null);
   const [status, setStatus] = useState('');
 
   useEffect(() => {
     fetchPassaros();
+    createBirds(); // Chamada para criar os pássaros
   }, []);
 
   const fetchPassaros = async () => {
@@ -24,30 +24,77 @@ function App() {
     }
   };
 
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus('Cadastrando...');
+    setStatus(editingId ? 'Atualizando...' : 'Cadastrando...');
 
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
+      const response = await fetch(
+        editingId ? `${API_URL}/${editingId}` : API_URL,
+        {
+          method: editingId ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        }
+      );
 
-      if (!response.ok) throw new Error('Falha no cadastro');
+      if (!response.ok) throw new Error('Erro na operação');
 
       await fetchPassaros();
       setForm({ nome: '', especie: '', idade: '' });
-      setStatus('Cadastro realizado!');
+      setEditingId(null);
+      setStatus(editingId ? 'Atualização feita!' : 'Cadastro realizado!');
     } catch (error) {
       setStatus(`Erro: ${error.message}`);
     }
   };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleEdit = (p) => {
+    setForm({ nome: p.nome, especie: p.especie, idade: p.idade });
+    setEditingId(p.id);
   };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Tem certeza que deseja remover?')) return;
+    try {
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      fetchPassaros();
+    } catch (error) {
+      setStatus(`Erro ao deletar: ${error.message}`);
+    }
+  };
+
+  // Função para criar os pássaros voando
+  const createBirds = () => {
+  const body = document.body;
+  const birdCount = 8;
+  
+  // Remove pássaros existentes para evitar duplicação
+  document.querySelectorAll('.bird').forEach(bird => bird.remove());
+  
+  for (let i = 0; i < birdCount; i++) {
+    const bird = document.createElement('div');
+    bird.className = 'bird';
+    
+    const startY = Math.random() * window.innerHeight;
+    const duration = 15 + Math.random() * 30;
+    const delay = Math.random() * 15;
+    const size = 0.5 + Math.random() * 0.7;
+    const rotation = Math.random() > 0.5 ? 'rotate(0deg)' : 'rotate(180deg)';
+    
+    bird.style.top = `${startY}px`;
+    bird.style.left = `${Math.random() * 100}px`;
+    bird.style.animationDuration = `${duration}s`;
+    bird.style.animationDelay = `${delay}s`;
+    bird.style.transform = `scale(${size}) ${rotation}`;
+    
+    body.appendChild(bird);
+  }
+};
 
   return (
     <div className="App">
@@ -76,7 +123,18 @@ function App() {
           placeholder="Idade"
         />
 
-        <button type="submit">Cadastrar</button>
+        <button type="submit">
+          {editingId ? 'Atualizar' : 'Cadastrar'}
+        </button>
+        {editingId && (
+          <button type="button" onClick={() => {
+            setEditingId(null);
+            setForm({ nome: '', especie: '', idade: '' });
+            setStatus('');
+          }}>
+            Cancelar
+          </button>
+        )}
       </form>
 
       <p>{status}</p>
@@ -85,7 +143,13 @@ function App() {
       <ul>
         {passaros.map((p) => (
           <li key={p.id}>
-            {p.nome} - {p.especie} ({p.idade} meses)
+            <div className="bird-info">
+              {p.nome} - {p.especie} ({p.idade} meses)
+            </div>
+            <div className="button-group">
+              <button onClick={() => handleEdit(p)}>Editar</button>
+              <button onClick={() => handleDelete(p.id)}>Remover</button>
+            </div>
           </li>
         ))}
       </ul>
