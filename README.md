@@ -30,8 +30,7 @@ Esse repositório foi feito para a matéria **DEVOPS - DC - UFSCar**, ofertada n
 1. Clone este repositório:
 
    ```bash
-   git clone <URL-do-repositório>
-   cd <nome-da-pasta>
+   git clone https://github.com/CarolinaMartinsEmilio/DEVOPS_T1.git
    ```
 
 2. Suba os contêineres com:
