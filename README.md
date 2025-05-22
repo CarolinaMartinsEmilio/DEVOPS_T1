@@ -41,7 +41,7 @@ Esse repositório foi feito para a matéria **DEVOPS - DC - UFSCar**, ofertada n
 
 3. Acesse no navegador:
 
-   👉 [http://localhost:3000](http://localhost:3000)
+   👉 [http://localhost:80](http://localhost:80)
 
 ---
 
@@ -87,12 +87,6 @@ docker-compose down
 
 ---
 
-## 🛠️ Observações
-
-- A aplicação assume que o banco de dados será iniciado limpo. Você pode usar um script de migração ou configurar uma inicialização automática com SQL se quiser mais robustez.
-- O frontend espera que a API esteja disponível em `/api/passaros`. O proxy reverso no `Dockerfile` e configuração da rede fazem esse roteamento.
-
----
 
 ## 📬 Contribuições
 
