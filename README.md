@@ -71,18 +71,6 @@ docker-compose down
 
 ---
 
-
-## 🐥 Visual dos Passarinhos
-
-```
-     \
-      \
-         🐦
-        <)___
-         (o o)
-    --oOO--(_)---OOo--
-```
-
 > Uma aplicação leve. Ideal para quem ama organizar dados e ama ainda mais os passarinhos 🧡
 
 ---
