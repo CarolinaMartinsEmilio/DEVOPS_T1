@@ -6,13 +6,13 @@ const port = 3000;
 
 
 app.use(cors({
-  origin: 'http://frontend', // Nome do serviço no docker-compose
+  origin: 'http://frontend', 
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
 app.use(express.json());
 
-// Conexão com o PostgreSQL
+
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -21,7 +21,7 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-// Rota raiz para teste
+
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 'API funcionando',
@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Rotas da aplicação
+
 app.get('/passaros', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM passaros ORDER BY id DESC');
@@ -62,7 +62,7 @@ app.post('/passaros', async (req, res) => {
     res.status(500).json({ error: 'Erro ao cadastrar passarinho' });
   }
 });
-// Atualizar um passarinho
+
 app.put('/passaros/:id', async (req, res) => {
   const { id } = req.params;
   const { nome, especie, idade } = req.body;
@@ -79,13 +79,13 @@ app.put('/passaros/:id', async (req, res) => {
   }
 });
 
-// Remover um passarinho
+
 app.delete('/passaros/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
     await pool.query('DELETE FROM passaros WHERE id = $1', [id]);
-    res.status(204).send(); // No Content
+    res.status(204).send();
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Erro ao deletar passarinho' });
@@ -93,7 +93,6 @@ app.delete('/passaros/:id', async (req, res) => {
 });
 
 
-// Inicia o servidor
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
   console.log('Banco de dados configurado com:');

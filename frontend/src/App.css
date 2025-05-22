@@ -9,8 +9,6 @@ body {
   position: relative;
 }
 
-/* Pássaros voando */
-/* Pássaros voando mais realistas */
 .bird {
   position: absolute;
   width: 30px;
@@ -157,7 +155,7 @@ li button:hover {
   background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
 }
 
-/* Efeitos de animação */
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -171,7 +169,6 @@ li {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Responsividade */
 @media (max-width: 640px) {
   .App {
     margin: 20px 15px;

@@ -11,7 +11,7 @@ function App() {
 
   useEffect(() => {
     fetchPassaros();
-    createBirds(); // Chamada para criar os pássaros
+    createBirds(); 
   }, []);
 
   const fetchPassaros = async () => {
@@ -68,12 +68,11 @@ function App() {
     }
   };
 
-  // Função para criar os pássaros voando
+
   const createBirds = () => {
   const body = document.body;
   const birdCount = 8;
   
-  // Remove pássaros existentes para evitar duplicação
   document.querySelectorAll('.bird').forEach(bird => bird.remove());
   
   for (let i = 0; i < birdCount; i++) {
